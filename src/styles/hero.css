@@ -787,12 +787,7 @@ nav.scrolled {
 .cs-val {
   color: var(--text);
   text-align: right;
-  font-weight: 500;
-}
-
-.cs-val.gold {
-  color: var(--text);
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .card-tags {
