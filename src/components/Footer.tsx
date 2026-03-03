@@ -4,7 +4,7 @@ export default function Footer() {
       <div className="footer-top">
         <div className="footer-brand">
           <a href="#" className="logo">
-            Lux<em>Date</em>
+            Checker<em>Viet</em>
           </a>
           <p>Dịch vụ bạn đồng hành cao cấp hàng đầu Việt Nam. Sang trọng, lịch sự và đáng tin cậy.</p>
         </div>
