@@ -79,7 +79,7 @@ export default function Hero() {
         <div className="hero-lines"></div>
 
         <div className="hero-topleft">
-          <div className="hero-eyebrow">Dịch vụ bạn đồng hành cao cấp</div>
+          <div className="hero-eyebrow">Luôn tuyển PGA - SGBB trên cả nước</div>
         </div>
 
         <div className="hero-center">
