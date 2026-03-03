@@ -1099,7 +1099,7 @@ export default function ModelProfile() {
   return (
     <div style={{ background: '#060606', color: '#f0ebe3', minHeight: '100vh' }}>
       <nav className="profile-nav">
-        <a href="/" className="profile-logo">Lux<span>Date</span></a>
+        <a href="/" className="profile-logo">Checker<span>Viet</span></a>
 
         <div className="profile-nav-cities">
           <button className="profile-city-pill" onClick={() => scrollToCity('saigon')}>
