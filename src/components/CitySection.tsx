@@ -141,18 +141,13 @@ export default function CitySection({ id, cityLabel, cityName, cityNameItalic, c
       `;
     }).join('');
 
+    track.getBoundingClientRect();
+
     track.style.willChange = 'transform';
     track.style.cursor = 'grab';
 
-    const getMaxScroll = () => {
-      const totalWidth = track.scrollWidth;
-      const visibleWidth = container.offsetWidth;
-      const maxOffset = totalWidth - visibleWidth;
-      return maxOffset;
-    };
-
     const setTransform = (x: number) => {
-      const maxScroll = getMaxScroll();
+      const maxScroll = Math.max(0, track.scrollWidth - (track.parentElement?.offsetWidth ?? 0));
       const clampedX = Math.max(-maxScroll, Math.min(0, x));
       track.style.transform = `translate3d(${clampedX}px, 0, 0)`;
       dragStateRef.current.currentX = clampedX;
@@ -181,7 +176,7 @@ export default function CitySection({ id, cityLabel, cityName, cityNameItalic, c
         velocity *= friction;
         position += velocity;
 
-        const maxScroll = getMaxScroll();
+        const maxScroll = Math.max(0, track.scrollWidth - (track.parentElement?.offsetWidth ?? 0));
         if (position > 0) {
           position = 0;
           velocity = 0;
@@ -296,9 +291,7 @@ export default function CitySection({ id, cityLabel, cityName, cityNameItalic, c
     const currentX = dragStateRef.current.currentX;
     const targetX = currentX + (scrollAmount * -direction);
 
-    const totalWidth = track.scrollWidth;
-    const visibleWidth = container.offsetWidth;
-    const maxScroll = totalWidth - visibleWidth;
+    const maxScroll = Math.max(0, track.scrollWidth - container.offsetWidth);
 
     const clampedX = Math.max(-maxScroll, Math.min(0, targetX));
 
