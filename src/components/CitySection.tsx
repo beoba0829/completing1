@@ -146,14 +146,20 @@ export default function CitySection({ id, cityLabel, cityName, cityNameItalic, c
     track.style.willChange = 'transform';
     track.style.cursor = 'grab';
 
-    const setTransform = (x: number) => {
+    const setTransform = (x: number, smooth = false) => {
       const container = track.parentElement;
       if (!container) return;
 
       const containerWidth = container.offsetWidth;
       const trackWidth = track.scrollWidth;
-      const maxScroll = Math.max(0, trackWidth - containerWidth);
+      const maxScroll = Math.max(0, trackWidth - containerWidth + 64);
       const clampedX = Math.max(-maxScroll, Math.min(0, x));
+
+      if (smooth) {
+        track.style.transition = 'transform 0.2s ease-out';
+      } else {
+        track.style.transition = 'none';
+      }
 
       track.style.transform = `translate3d(${clampedX}px, 0, 0)`;
       dragStateRef.current.currentX = clampedX;
@@ -169,13 +175,21 @@ export default function CitySection({ id, cityLabel, cityName, cityNameItalic, c
     const applyMomentum = () => {
       stopAnimation();
 
-      const friction = 0.94;
+      const friction = 0.92;
       let velocity = dragStateRef.current.velocity;
       let position = dragStateRef.current.currentX;
 
       const animate = () => {
-        if (Math.abs(velocity) < 0.5) {
+        if (Math.abs(velocity) < 0.3) {
           dragStateRef.current.velocity = 0;
+          const container = track.parentElement;
+          if (container) {
+            const containerWidth = container.offsetWidth;
+            const trackWidth = track.scrollWidth;
+            const maxScroll = Math.max(0, trackWidth - containerWidth + 64);
+            const finalPosition = Math.max(-maxScroll, Math.min(0, position));
+            setTransform(finalPosition, true);
+          }
           return;
         }
 
@@ -187,25 +201,25 @@ export default function CitySection({ id, cityLabel, cityName, cityNameItalic, c
 
         const containerWidth = container.offsetWidth;
         const trackWidth = track.scrollWidth;
-        const maxScroll = Math.max(0, trackWidth - containerWidth);
+        const maxScroll = Math.max(0, trackWidth - containerWidth + 64);
 
         if (position > 0) {
-          position = 0;
-          velocity = 0;
+          position = Math.min(position, 30);
+          velocity *= 0.75;
         }
         if (position < -maxScroll) {
-          position = -maxScroll;
-          velocity = 0;
+          position = Math.max(position, -maxScroll - 30);
+          velocity *= 0.75;
         }
 
-        setTransform(position);
+        setTransform(position, false);
 
-        if (Math.abs(velocity) >= 0.5) {
+        if (Math.abs(velocity) >= 0.3) {
           dragStateRef.current.animationId = requestAnimationFrame(animate);
         }
       };
 
-      if (Math.abs(velocity) > 0.5) {
+      if (Math.abs(velocity) > 0.3) {
         dragStateRef.current.animationId = requestAnimationFrame(animate);
       }
     };
@@ -226,6 +240,7 @@ export default function CitySection({ id, cityLabel, cityName, cityNameItalic, c
       dragStateRef.current.lastTime = performance.now();
 
       track.style.cursor = 'grabbing';
+      track.style.transition = 'none';
     };
 
     const handleMove = (e: MouseEvent | TouchEvent) => {
@@ -243,15 +258,30 @@ export default function CitySection({ id, cityLabel, cityName, cityNameItalic, c
 
       const now = performance.now();
       const deltaTime = Math.max(now - dragStateRef.current.lastTime, 1);
-      dragStateRef.current.velocity = (deltaX / deltaTime) * 16;
+      const rawVelocity = (deltaX / deltaTime) * 16;
+      dragStateRef.current.velocity = rawVelocity * 1.3;
       dragStateRef.current.lastX = clientX;
       dragStateRef.current.lastTime = now;
 
       const totalDelta = clientX - dragStateRef.current.startX;
-      const newPosition = dragStateRef.current.currentX + totalDelta;
-      dragStateRef.current.startX = clientX;
+      let newPosition = dragStateRef.current.currentX + totalDelta;
 
-      setTransform(newPosition);
+      const container = track.parentElement;
+      if (container) {
+        const containerWidth = container.offsetWidth;
+        const trackWidth = track.scrollWidth;
+        const maxScroll = Math.max(0, trackWidth - containerWidth + 64);
+
+        if (newPosition > 0) {
+          newPosition = newPosition * 0.35;
+        } else if (newPosition < -maxScroll) {
+          const overshoot = newPosition + maxScroll;
+          newPosition = -maxScroll + (overshoot * 0.35);
+        }
+      }
+
+      dragStateRef.current.startX = clientX;
+      setTransform(newPosition, false);
     };
 
     const handleEnd = () => {
@@ -310,7 +340,7 @@ export default function CitySection({ id, cityLabel, cityName, cityNameItalic, c
 
     const containerWidth = container.offsetWidth;
     const trackWidth = track.scrollWidth;
-    const maxScroll = Math.max(0, trackWidth - containerWidth);
+    const maxScroll = Math.max(0, trackWidth - containerWidth + 64);
 
     const clampedX = Math.max(-maxScroll, Math.min(0, targetX));
 
