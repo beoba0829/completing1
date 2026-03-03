@@ -98,7 +98,7 @@ export default function Hero() {
               className="btn-hero-primary"
               onClick={() => window.open('https://t.me/hoahong8388', '_blank')}
             >
-              Khám phá ngay
+              Xem ngay
             </button>
           </div>
         </div>
